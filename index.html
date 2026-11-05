@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#fff3e8">
+<meta name="description" content="ふたりの感覚で、最高の順位。2人協力型カードゲーム ito DUO">
+<link rel="manifest" href="./manifest.json">
+<title>ito DUO</title>
+<style>
+:root{--ink:#3c3450;--muted:#81788f;--pink:#ff8eaa;--orange:#ffb56b;--yellow:#ffe18b;--blue:#8ccde4;--mint:#9edbc5;--paper:#fffaf5;--line:#eee3dc;--shadow:0 8px 24px #4b365014}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#f8eee8;color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
+body{display:flex;justify-content:center;overscroll-behavior:none}
+button,input,select,textarea{font:inherit}
+button{border:0;cursor:pointer;color:inherit}
+#app{width:100%;max-width:540px;min-height:100dvh;background:var(--paper);position:relative;overflow:hidden;padding:env(safe-area-inset-top) 16px calc(18px + env(safe-area-inset-bottom));}
+.screen{display:none;min-height:calc(100dvh - 30px);padding:14px 0 28px}.screen.active{display:block}
+.hero{border-radius:30px;background:linear-gradient(145deg,#ffe2e9,#fff0c9 58%,#dff4ec);padding:28px 22px 24px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;background:#fff9;filter:blur(1px)}.hero:before{width:90px;height:90px;left:-22px;top:15px}.hero:after{width:110px;height:110px;right:-30px;bottom:-35px}
+.logo{font-size:clamp(38px,11vw,58px);font-weight:1000;letter-spacing:-2px;line-height:1.1;position:relative}.logo span{color:#f17d9d}
+.tagline{font-size:15px;font-weight:800;margin:12px 0 18px;position:relative}
+.card-art{height:135px;display:flex;align-items:center;justify-content:center;gap:9px;position:relative}
+.playcard{width:76px;height:106px;border-radius:15px;background:white;border:2px solid #fff;box-shadow:0 7px 15px #8b647326;display:grid;place-items:center;font-size:28px;font-weight:1000;transform:rotate(-10deg)}
+.playcard:nth-child(2){transform:translateY(-12px) rotate(3deg);background:#fff8d9}.playcard:nth-child(3){transform:rotate(10deg);background:#e9f7f1}
+h1{font-size:25px;margin:6px 0 18px}h2{font-size:19px;margin:8px 0 14px}h3{font-size:15px;margin:12px 0 8px}
+p{line-height:1.65}.muted{color:var(--muted);font-size:13px}
+.btn{width:100%;padding:15px 18px;border-radius:17px;font-weight:900;font-size:16px;background:var(--ink);color:white;box-shadow:0 5px 0 #29233a;margin:7px 0}
+.btn.primary{background:linear-gradient(100deg,#ff8eaa,#ffb56b);color:#4a3042;box-shadow:0 5px 0 #e58a91}
+.btn.soft{background:#fff;border:1px solid var(--line);color:var(--ink);box-shadow:0 4px 0 #eee4df}
+.btn.small{width:auto;padding:9px 13px;font-size:13px;margin:3px}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.panel{background:white;border:1px solid var(--line);border-radius:22px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+.field{display:flex;flex-direction:column;gap:6px;margin:12px 0;font-weight:800;font-size:13px}
+input,select,textarea{width:100%;padding:12px 13px;border:1px solid #e8dcd5;border-radius:13px;background:#fffaf7;color:var(--ink);outline:none}
+textarea{min-height:90px;resize:vertical}
+.pill{display:inline-block;padding:6px 10px;border-radius:99px;background:#fff0d9;font-size:12px;font-weight:800}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin:2px 0 14px}
+.back{background:white;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:800}
+.theme-box{background:linear-gradient(120deg,#fff0d8,#ffe6ed);border-radius:22px;padding:17px;text-align:center;margin:12px 0}
+.theme-label{font-size:11px;font-weight:900;letter-spacing:2px;color:#a77b70}.theme-text{font-size:21px;font-weight:1000;margin-top:7px}
+.player-zone{border-radius:20px;padding:13px;margin:12px 0;background:#f2f8f6;border:1px solid #dcefe8}
+.player-zone.p2{background:#f8f0f8;border-color:#efdfed;transform:rotate(180deg)}
+.player-title{text-align:center;font-size:12px;font-weight:900;color:var(--muted);margin-bottom:8px}
+.hand{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
+.mini-card{width:55px;height:76px;border-radius:12px;background:white;border:2px solid #fff;box-shadow:0 3px 9px #4b36501a;display:grid;place-items:center;font-size:22px;font-weight:1000;color:#9a8fa3}
+.mini-card.hidden{background:repeating-linear-gradient(135deg,#ffb5c4,#ffb5c4 7px,#ffd6dc 7px,#ffd6dc 14px);color:#9a4e68}
+.mini-card.selected{outline:3px solid var(--orange);transform:translateY(-4px)}
+.center-area{background:#fff7e7;border:2px dashed #e9c98d;border-radius:20px;padding:12px;min-height:108px}
+.center-cards{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;min-height:78px;align-items:center}
+.sort-card{width:49px;height:68px;border-radius:11px;background:white;border:2px solid #f2d8a4;box-shadow:0 3px 8px #4b365018;display:grid;place-items:center;font-size:20px;font-weight:1000;position:relative}
+.sort-card small{position:absolute;bottom:2px;font-size:8px;color:#a69a8c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.actions .btn{flex:1;min-width:120px}
+.progress{height:8px;border-radius:99px;background:#eee4df;overflow:hidden;margin:10px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--orange))}
+.listrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #f0e8e3}
+.listrow:last-child{border:0}
+.tag{font-size:11px;background:#f2f0f7;padding:4px 8px;border-radius:99px}
+.result-score{font-size:48px;font-weight:1000;text-align:center;color:#e47e9b}
+.good{color:#278c70}.bad{color:#d16e78}
+.notice{font-size:12px;color:#8a7e8d;background:#f8f3f0;padding:10px 12px;border-radius:12px;line-height:1.55}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.tab{padding:8px 11px;border-radius:99px;background:#f2edf0;font-size:12px;font-weight:800}.tab.active{background:#ffe0e7}
+footer{text-align:center;color:#b2a6a1;font-size:10px;padding:20px 0}
+@media (min-width:541px){#app{box-shadow:0 0 50px #503b321c}}
+@media (orientation:landscape) and (max-height:500px){#app:after{content:"スマートフォンを縦向きにして遊んでね";position:fixed;inset:0;background:#fffaf5;z-index:99;display:grid;place-items:center;font-weight:900;font-size:20px}}
+</style>
+</head>
+<body><main id="app">
+<section id="home" class="screen active">
+ <div class="hero">
+  <div class="logo">ito <span>DUO</span></div><div class="tagline">ふたりの感覚で、最高の順位。</div>
+  <div class="card-art"><div class="playcard">12</div><div class="playcard">♡</div><div class="playcard">87</div></div>
+  <div class="pill">2人協力型カードゲーム</div>
+ </div>
+ <button class="btn primary" onclick="show('setup')">ゲームスタート！</button>
+ <div class="grid2"><button class="btn soft" onclick="show('rules')">遊び方</button><button class="btn soft" onclick="show('ranking')">ランキング</button></div>
+ <div class="grid2"><button class="btn soft" onclick="show('themes')">お題を管理</button><button class="btn soft" onclick="show('settings')">設定</button></div>
+ <p class="muted" style="text-align:center">ふたりで相談して、数字の順番を完成させよう！</p>
+</section>
+
+<section id="setup" class="screen">
+ <div class="topbar"><button class="back" onclick="show('home')">← 戻る</button><span class="pill">GAME SETUP</span></div>
+ <h1>ゲームの準備</h1>
+ <div class="panel">
+  <label class="field">ラウンド数<select id="roundCount"><option>1</option><option selected>3</option><option>5</option><option>10</option></select></label>
+  <label class="field">配るカード枚数<select id="cardCount"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></label>
+  <label class="field">プレイヤー1の名前<input id="name1" maxlength="12" value="プレイヤー1"></label>
+  <label class="field">プレイヤー2の名前<input id="name2" maxlength="12" value="プレイヤー2"></label>
+  <label class="field">お題カテゴリー<select id="category"><option value="すべて">すべて</option><option>日常</option><option>食べ物</option><option>遊び</option><option>感情</option><option>場所</option><option>もしも</option></select></label>
+ </div>
+ <button class="btn primary" onclick="startGame()">この設定でスタート</button>
+</section>
+
+<section id="game" class="screen">
+ <div class="topbar"><span class="pill" id="roundLabel">ROUND 1</span><button class="back" onclick="if(confirm('ゲームを中断してホームに戻る？'))show('home')">中断</button></div>
+ <div class="progress"><span id="progressBar" style="width:20%"></span></div>
+ <div class="theme-box"><div class="theme-label">TODAY'S THEME</div><div class="theme-text" id="themeText"></div></div>
+ <div class="player-zone p2" id="zone2"><div class="player-title" id="p2title">PLAYER 2</div><div class="hand" id="hand2"></div></div>
+ <div class="center-area"><div class="player-title">ふたりで並べるエリア（小さい → 大きい）</div><div class="center-cards" id="centerCards"><span class="muted">カードを選んでここに並べよう</span></div></div>
+ <div class="player-zone" id="zone1"><div class="player-title" id="p1title">PLAYER 1</div><div class="hand" id="hand1"></div></div>
+ <div class="notice" id="gameMessage">自分のカードをタップして数字を確認しよう。数字を見たら、相手に見えないように伏せてね。</div>
+ <div class="actions"><button class="btn soft" onclick="togglePrivacy()">数字を隠す / 見る</button><button class="btn primary" onclick="nextPhase()">次へ</button></div>
+ <div class="actions"><button class="btn soft" onclick="undoCard()">1枚戻す</button><button class="btn soft" onclick="checkOrder()">答え合わせ</button></div>
+</section>
+
+<section id="result" class="screen">
+ <div class="topbar"><span class="pill">ROUND RESULT</span><span id="resultRound" class="muted"></span></div>
+ <h1 style="text-align:center">答え合わせ！</h1>
+ <div class="theme-box"><div class="theme-label">THEME</div><div class="theme-text" id="resultTheme"></div></div>
+ <div id="resultCards" class="center-cards"></div>
+ <div class="result-score" id="roundScore">0</div><div style="text-align:center;font-weight:900">POINTS</div>
+ <h2 id="grade" style="text-align:center"></h2>
+ <p id="resultText" class="muted" style="text-align:center"></p>
+ <button class="btn primary" onclick="continueAfterResult()">次へ進む</button>
+</section>
+
+<section id="final" class="screen">
+ <div class="hero"><div class="pill">ALL ROUNDS COMPLETE</div><h1>ふたりの結果！</h1><div class="result-score" id="totalScore">0</div><div style="font-weight:900">TOTAL POINTS</div></div>
+ <div class="panel"><label class="field">ペア名<input id="pairName" maxlength="18" placeholder="ふたりの名前"></label><button class="btn primary" onclick="saveRanking()">ランキングに登録</button></div>
+ <div id="finalSummary" class="notice"></div>
+ <button class="btn soft" onclick="show('home')">ホームに戻る</button>
+</section>
+
+<section id="themes" class="screen">
+ <div class="topbar"><button class="back" onclick="show('home')">← 戻る</button><span class="pill">THEME BOX</span></div>
+ <h1>お題を管理</h1>
+ <div class="panel"><label class="field">新しいお題<input id="newTheme" maxlength="50" placeholder="例：一度はやってみたいこと"></label><label class="field">カテゴリー<select id="newCategory"><option>日常</option><option>食べ物</option><option>遊び</option><option>感情</option><option>場所</option><option>もしも</option></select></label><button class="btn primary" onclick="addTheme()">お題を追加</button></div>
+ <div class="panel"><h3>AIお題生成サポート</h3><p class="muted">登録済みのお題と重複しにくい新しいお題をAIに考えてもらうための文章をコピーできるよ。</p><button class="btn soft" onclick="copyPrompt()">生成プロンプトをコピー</button></div>
+ <div class="tabs" id="themeTabs"></div><div id="themeList" class="panel"></div>
+</section>
+
+<section id="ranking" class="screen">
+ <div class="topbar"><button class="back" onclick="show('home')">← 戻る</button><span class="pill">TOP 10</span></div>
+ <h1>ふたりのランキング</h1><div id="rankingList" class="panel"></div>
+ <button class="btn soft" onclick="if(confirm('ランキングをすべて削除する？')){localStorage.removeItem('itoDuoRanking');renderRanking()}">ランキングをリセット</button>
+</section>
+
+<section id="rules" class="screen">
+ <div class="topbar"><button class="back" onclick="show('home')">← 戻る</button><span class="pill">HOW TO PLAY</span></div>
+ <h1>遊び方</h1>
+ <div class="panel">
+  <h3>① お題と数字を確認</h3><p>お題に対して、配られた数字（1〜100）に合う答えを頭の中で考えよう。数字が小さいほど「お題に当てはまる度合い」が低く、大きいほど高いイメージ。</p>
+  <h3>② 相手に見せずに確認</h3><p>カードをタップして数字を確認。確認したら伏せて、相手に数字を見せないようにしよう。スマホを相手に渡すときは数字を隠してね。</p>
+  <h3>③ 小さい順に並べる</h3><p>ふたりで相談しながら、カードを中央エリアに小さいと思う順で並べよう。カードをタップすると数字を確認できるよ。</p>
+  <h3>④ 答え合わせ</h3><p>全カードを並べたら「答え合わせ」。正しい順番と得点が表示されるよ。何ラウンド連続で高得点を取れるかな？</p>
+  <div class="notice">このゲームは2人で1台のスマートフォンを使う協力ゲームです。数字を確認するときは、相手から画面が見えないように工夫してね。</div>
+ </div>
+</section>
+
+<section id="settings" class="screen">
+ <div class="topbar"><button class="back" onclick="show('home')">← 戻る</button><span class="pill">SETTINGS</span></div>
+ <h1>設定</h1>
+ <div class="panel"><h3>データについて</h3><p class="muted">追加したお題・お気に入り・ランキングは、この端末のブラウザに保存されます。別の端末とは自動共有されません。</p><button class="btn soft" onclick="if(confirm('追加したお題とお気に入りを初期状態に戻す？')){localStorage.removeItem('itoDuoThemes');localStorage.removeItem('itoDuoFav');loadThemes();alert('初期状態に戻しました')}">お題データを初期化</button></div>
+ <div class="panel"><h3>画面について</h3><p class="muted">スマートフォンを縦向きにして、ふたりの間に置いて遊んでね。横向きでは縦向きに戻す案内が表示されます。</p></div>
+</section>
+<footer>ito DUO · Play together, rank together.</footer>
+</main>
+<script>
+const defaultThemes=[
+["テンションが上がる瞬間","感情"],["一度は食べてみたいもの","食べ物"],["無人島に持っていきたいもの","もしも"],["もらったら嬉しいプレゼント","日常"],["旅行先で行ってみたい場所","場所"],["休日にしたいこと","日常"],["言われたら嬉しい言葉","感情"],["人生で一度は見たい景色","場所"],["朝起きて最初にしたいこと","日常"],["お祭りで食べたいもの","食べ物"],["子どもの頃に好きだった遊び","遊び"],["テンションが下がる瞬間","感情"],["住んでみたい街","場所"],["一日だけなれるならなりたいもの","もしも"],["コンビニでつい買ってしまうもの","食べ物"],["何時間でもできること","遊び"],["雨の日にしたいこと","日常"],["一番落ち着く場所","場所"],["友達と盛り上がる話題","遊び"],["食べると幸せになるもの","食べ物"],["言われてみたい褒め言葉","感情"],["旅行に持っていきたいもの","日常"],["一度は挑戦したいこと","遊び"],["自分へのご褒美にしたいもの","日常"],["見つけたら嬉しいもの","日常"],["夏に楽しみたいこと","遊び"],["冬に食べたいもの","食べ物"],["ずっと見ていられるもの","日常"],["学校で好きだった時間","日常"],["世界で一番かわいいと思うもの","日常"],["理想の休日の過ごし方","日常"],["行列に並んでも食べたいもの","食べ物"],["一度は泊まってみたい場所","場所"],["もらうと困るもの","日常"],["気分転換になること","感情"],["大人になってよかったと思う瞬間","感情"],["子どもの頃の憧れ","もしも"],["好きな香り","日常"],["一番好きな季節のイベント","遊び"],["旅行先で買いたいお土産","日常"],["疲れた日に食べたいもの","食べ物"],["家にあったら嬉しいもの","日常"],["友達とやってみたいこと","遊び"],["一番ワクワクする予定","感情"],["苦手だけど克服したいこと","もしも"],["一度は行ってみたい国","場所"],["お腹が空いているときに見たくないもの","食べ物"],["自分の部屋に置きたいもの","日常"],["見ていると元気になるもの","感情"],["一番好きな音","日常"],["旅行で重視したいこと","場所"],["お祝いの日に食べたいもの","食べ物"],["時間を忘れて夢中になること","遊び"],["言われたらやる気が出る言葉","感情"],["人生で大切にしたいこと","日常"],["一度は体験してみたい仕事","もしも"],["住むなら海の近くか山の近くか","場所"],["最高の気分になる天気","感情"],["学校帰りに寄りたい場所","場所"],["一番好きなパン","食べ物"],["友達におすすめしたいアプリ","日常"],["休日の朝にしたいこと","日常"],["一番好きな給食","食べ物"],["見ていて飽きない動物","日常"],["もし透明人間になったらしたいこと","もしも"],["カラオケで歌いたい曲","遊び"],["一番好きな匂いのする場所","場所"],["頑張った日に食べたいもの","食べ物"],["一緒に旅行したい人","日常"],["気まずいと感じる瞬間","感情"],["一度は参加したいイベント","遊び"],["人生で一番笑った出来事","感情"],["家に常備しておきたい食べ物","食べ物"],["一番好きな飲み物","食べ物"],["時間があれば始めたい趣味","遊び"],["何度でも行きたい場所","場所"],["朝に聞きたい音楽","日常"],["一番嬉しいサプライズ","感情"],["もし一週間休みならしたいこと","もしも"],["自分を元気にする習慣","日常"],["一番好きなアイス","食べ物"],["初対面の人と話したい話題","遊び"]
+];
+let themes=[],favorites=new Set(JSON.parse(localStorage.getItem('itoDuoFav')||'[]')),themeFilter='すべて';
+function loadThemes(){themes=JSON.parse(localStorage.getItem('itoDuoThemes')||'null')||defaultThemes.map((t,i)=>({id:'d'+i,text:t[0],cat:t[1],base:true}));saveThemes()}
+function saveThemes(){localStorage.setItem('itoDuoThemes',JSON.stringify(themes))}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='themes')renderThemes();if(id==='ranking')renderRanking();window.scrollTo(0,0)}
+function addTheme(){let text=document.getElementById('newTheme').value.trim(),cat=document.getElementById('newCategory').value;if(!text)return alert('お題を入力してね');if(themes.some(t=>t.text===text))return alert('同じお題がすでにあるよ');themes.unshift({id:'u'+Date.now(),text,cat,base:false});saveThemes();document.getElementById('newTheme').value='';renderThemes()}
+function removeTheme(id){let t=themes.find(x=>x.id===id);if(t?.base){t.deleted=true}else themes=themes.filter(x=>x.id!==id);saveThemes();renderThemes()}
+function restoreThemes(){themes=themes.filter(t=>!t.deleted);saveThemes();renderThemes()}
+function renderThemes(){let cats=['すべて','日常','食べ物','遊び','感情','場所','もしも'];document.getElementById('themeTabs').innerHTML=cats.map(c=>`<button class="tab ${themeFilter===c?'active':''}" onclick="themeFilter='${c}';renderThemes()">${c}</button>`).join('');let list=themes.filter(t=>!t.deleted&&(themeFilter==='すべて'||t.cat===themeFilter));document.getElementById('themeList').innerHTML=list.map(t=>`<div class="listrow"><div><b>${esc(t.text)}</b><div class="muted">${t.cat}</div></div><div><button class="btn small soft" onclick="toggleFav('${t.id}')">${favorites.has(t.id)?'★':'☆'}</button><button class="btn small soft" onclick="removeTheme('${t.id}')">削除</button></div></div>`).join('')+`<button class="btn soft" onclick="restoreThemes()">削除した初期お題を復元</button>`}
+function toggleFav(id){favorites.has(id)?favorites.delete(id):favorites.add(id);localStorage.setItem('itoDuoFav',JSON.stringify([...favorites]));renderThemes()}
+function copyPrompt(){let existing=themes.filter(t=>!t.deleted).map(t=>t.text).join('、');let p=`ito DUO用のお題を30個作ってください。条件：1〜100で主観的な順位をつけられること、2人で感覚の違いを話し合えること。「〇〇なもの」「〇〇な瞬間」「〇〇したいこと」など自然な短い日本語にすること。既存テーマと重複・類似しないこと。説明や番号は付けず、1行に1テーマで出力してください。\\n既存テーマ：${existing}`;navigator.clipboard?.writeText(p).then(()=>alert('生成プロンプトをコピーしたよ！')).catch(()=>prompt('この文章をコピーしてね',p))}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+let game={},phase='inspect',visible=true,selected=null;
+function startGame(){let rounds=+document.getElementById('roundCount').value,n=+document.getElementById('cardCount').value;game={rounds,n,round:1,total:0,results:[],names:[document.getElementById('name1').value||'プレイヤー1',document.getElementById('name2').value||'プレイヤー2'],used:[],deck:[],center:[],theme:''};dealRound();show('game')}
+function pickTheme(){let cat=document.getElementById('category').value;let pool=themes.filter(t=>!t.deleted&&(cat==='すべて'||t.cat===cat)&&!game.used.includes(t.id));if(!pool.length){game.used=[];pool=themes.filter(t=>!t.deleted&&(cat==='すべて'||t.cat===cat))}let t=pool[Math.floor(Math.random()*pool.length)]||{text:'好きなもの',id:'fallback'};game.used.push(t.id);return t.text}
+function dealRound(){let nums=Array.from({length:100},(_,i)=>i+1).sort(()=>Math.random()-.5).slice(0,game.n*2);game.deck=[nums.slice(0,game.n).map((v,i)=>({id:'a'+i,num:v,owner:0,shown:false,placed:false})),nums.slice(game.n).map((v,i)=>({id:'b'+i,num:v,owner:1,shown:false,placed:false}))];game.center=[];game.theme=pickTheme();phase='inspect';visible=false;selected=null;renderGame()}
+function renderGame(){document.getElementById('roundLabel').textContent=`ROUND ${game.round} / ${game.rounds}`;document.getElementById('progressBar').style.width=(game.round/game.rounds*100)+'%';document.getElementById('themeText').textContent=game.theme;document.getElementById('p1title').textContent=game.names[0]+' · 自分のカード';document.getElementById('p2title').textContent=game.names[1]+' · 自分のカード';renderHands();renderCenter();document.getElementById('gameMessage').textContent=phase==='inspect'?'カードをタップして数字を確認しよう。確認したら「次へ」で並べ替えに進もう。': 'カードをタップして選び、中央の位置を選んで並べよう。長押しでも数字を確認できるよ。'}
+function renderHands(){[0,1].forEach(p=>{let el=document.getElementById('hand'+(p+1));el.innerHTML=game.deck[p].map(c=>`<button class="mini-card ${c.placed?'hidden':''} ${selected===c.id?'selected':''}" onclick="cardTap('${c.id}')" oncontextmenu="event.preventDefault();peek('${c.id}')">${c.placed?'✓':(visible||c.shown?c.num:'?')}</button>`).join('')})}
+function renderCenter(){let el=document.getElementById('centerCards');if(!game.center.length){el.innerHTML='<span class="muted">ここにカードを並べよう</span>';return}el.innerHTML=game.center.map((c,i)=>`<button class="sort-card" onclick="centerTap(${i})">${visible?c.num:'?' }<small>${i+1}番目</small></button>`).join('')}
+function findCard(id){return game.deck.flat().find(c=>c.id===id)}
+function cardTap(id){let c=findCard(id);if(!c)return;if(phase==='inspect'){c.shown=!c.shown;visible=true;renderHands();setTimeout(()=>{visible=false;renderHands()},3500);return}if(c.placed){return}selected=selected===id?null:id;visible=true;renderHands();if(selected){let pos=prompt(`「${c.num}」を何番目に入れる？（1〜${game.center.length+1}）`,String(game.center.length+1));if(pos===null){selected=null;visible=false;renderHands();return}let i=Math.max(0,Math.min(game.center.length,+pos-1||0));game.center.splice(i,0,c);c.placed=true;selected=null;visible=false;renderGame()}}
+function centerTap(i){if(phase!=='sort')return;let c=game.center[i];alert('このカードの数字：'+c.num)}
+function peek(id){let c=findCard(id);if(c)alert('カードの数字：'+c.num)}
+function togglePrivacy(){visible=!visible;renderHands();renderCenter()}
+function nextPhase(){if(phase==='inspect'){phase='sort';visible=false;renderGame();return}if(game.center.length<game.n*2){alert('すべてのカードを中央に並べてね');return}checkOrder()}
+function undoCard(){let c=game.center.pop();if(c){c.placed=false;renderGame()}}
+function checkOrder(){if(game.center.length!==game.n*2)return alert('先にすべてのカードを並べてね');let sorted=[...game.center].sort((a,b)=>a.num-b.num);let correct=0;game.center.forEach((c,i)=>{if(c.id===sorted[i].id)correct++});let perfect=correct===game.center.length;let consecutive=0;for(let i=0;i<game.center.length-1;i++)if(game.center[i].num+1===game.center[i+1].num&&game.center[i].id===sorted[i].id&&game.center[i+1].id===sorted[i+1].id)consecutive++;let score=correct*100+ (perfect?300:0)+consecutive*50;game.last={correct,total:game.center.length,score,perfect,sorted};game.total+=score;game.results.push(game.last);document.getElementById('resultRound').textContent=`ROUND ${game.round}`;document.getElementById('resultTheme').textContent=game.theme;document.getElementById('resultCards').innerHTML=game.center.map(c=>`<div class="sort-card">${c.num}</div>`).join('');document.getElementById('roundScore').textContent=score;let rate=correct/game.center.length;document.getElementById('grade').textContent=perfect?'PERFECT！':rate>=.75?'GREAT！':rate>=.5?'NICE！':'KEEP GOING！';document.getElementById('resultText').textContent=`正しい位置：${correct} / ${game.center.length}枚　・　正答率：${Math.round(rate*100)}%`;show('result')}
+function continueAfterResult(){if(game.round<game.rounds){game.round++;dealRound();show('game')}else{let bonus=game.results.every(r=>r.perfect)?500:0;game.total+=bonus;document.getElementById('totalScore').textContent=game.total;document.getElementById('finalSummary').textContent=game.results.map((r,i)=>`第${i+1}ラウンド：${r.correct}/${r.total}枚・${r.score}点`).join('　／　')+(bonus?'　／　全ラウンド完全正解ボーナス：+500点':'');show('final')}}
+function saveRanking(){let name=document.getElementById('pairName').value.trim()||game.names.join('＆');let data=JSON.parse(localStorage.getItem('itoDuoRanking')||'[]');data.push({name,score:game.total,date:new Date().toLocaleString('ja-JP')});data.sort((a,b)=>b.score-a.score);localStorage.setItem('itoDuoRanking',JSON.stringify(data.slice(0,10)));alert('ランキングに登録したよ！');show('ranking')}
+function renderRanking(){let d=JSON.parse(localStorage.getItem('itoDuoRanking')||'[]');document.getElementById('rankingList').innerHTML=d.length?d.map((x,i)=>`<div class="listrow"><b>${i+1}位　${esc(x.name)}</b><div style="text-align:right"><b>${x.score}点</b><div class="muted">${x.date}</div></div></div>`).join(''):'<p class="muted">まだ記録がないよ。ふたりで挑戦してみよう！</p>'}
+loadThemes();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script></body></html>
