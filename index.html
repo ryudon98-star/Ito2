@@ -74,6 +74,7 @@ footer{text-align:center;color:#b2a6a1;font-size:10px;padding:20px 0}
   <div class="pill">2人協力型カードゲーム</div>
  </div>
  <button class="btn primary" onclick="show('setup')">ゲームスタート！</button>
+ <button id="installBtn" class="btn soft" onclick="installApp()" style="display:none">📲 アプリとしてダウンロード</button>
  <div class="grid2"><button class="btn soft" onclick="show('rules')">遊び方</button><button class="btn soft" onclick="show('ranking')">ランキング</button></div>
  <div class="grid2"><button class="btn soft" onclick="show('themes')">お題を管理</button><button class="btn soft" onclick="show('settings')">設定</button></div>
  <p class="muted" style="text-align:center">ふたりで相談して、数字の順番を完成させよう！</p>
@@ -151,7 +152,42 @@ footer{text-align:center;color:#b2a6a1;font-size:10px;padding:20px 0}
 <section id="settings" class="screen">
  <div class="topbar"><button class="back" onclick="show('home')">← 戻る</button><span class="pill">SETTINGS</span></div>
  <h1>設定</h1>
- <div class="panel"><h3>データについて</h3><p class="muted">追加したお題・お気に入り・ランキングは、この端末のブラウザに保存されます。別の端末とは自動共有されません。</p><button class="btn soft" onclick="if(confirm('追加したお題とお気に入りを初期状態に戻す？')){localStorage.removeItem('itoDuoThemes');localStorage.removeItem('itoDuoFav');loadThemes();alert('初期状態に戻しました')}">お題データを初期化</button></div>
+ <div class="panel"><h3>データについて</h3><p class="muted">追加したお題・お気に入り・ランキングは、この端末のブラウザに保存されます。別の端末とは自動共有されません。</p><button class="btn soft" onclick="if(confirm('追加したお題とお気に入りを初期状態に戻す？')){localStorage.removeItem('itoDuoThemes');localStorage.removeItem('itoDuoFav');
+let deferredInstallPrompt=null;
+const installButton=document.getElementById('installBtn');
+function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream}
+function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true}
+window.addEventListener('beforeinstallprompt',e=>{
+ e.preventDefault();
+ deferredInstallPrompt=e;
+ if(installButton && !isStandalone()){installButton.style.display='block';installButton.textContent='📲 アプリとしてダウンロード'}
+});
+window.addEventListener('appinstalled',()=>{
+ deferredInstallPrompt=null;
+ if(installButton){installButton.style.display='block';installButton.textContent='✓ インストール済み';installButton.disabled=true}
+});
+function installApp(){
+ if(isStandalone()){alert('ito DUO はすでにアプリとして起動しています！');return}
+ if(deferredInstallPrompt){
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(choice=>{
+   if(choice.outcome==='accepted'){
+    installButton.textContent='✓ インストールしました';
+    installButton.disabled=true;
+   }
+   deferredInstallPrompt=null;
+  });
+  return;
+ }
+ if(isIOS()){
+  alert('iPhone / iPadでは、Safariの「共有」ボタンを押して「ホーム画面に追加」を選ぶとアプリのように使えます。');
+ }else{
+  alert('このブラウザではインストールボタンを表示できないようです。Chromeなどのメニューから「アプリをインストール」または「ホーム画面に追加」を選んでください。HTTPSで公開されていることも確認してね。');
+ }
+}
+if(isStandalone() && installButton){installButton.style.display='block';installButton.textContent='✓ アプリとして起動中';installButton.disabled=true}
+
+loadThemes();alert('初期状態に戻しました')}">お題データを初期化</button></div>
  <div class="panel"><h3>画面について</h3><p class="muted">スマートフォンを縦向きにして、ふたりの間に置いて遊んでね。横向きでは縦向きに戻す案内が表示されます。</p></div>
 </section>
 <footer>ito DUO · Play together, rank together.</footer>
